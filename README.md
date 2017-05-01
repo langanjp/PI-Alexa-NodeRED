@@ -13,3 +13,7 @@ This project and tutorial show connecting to Amazon's Alexa service with the OSI
 * OSIsoft PI Web API Server that can be accessed by you Node-RED instance
      * Version 2016 or greater
      * Ideally with a certificate from a trusted authority
+     * Set up to use Basic authentication
+* Amazon.com account
+     * You can link your Amazon account with the Alexa Developer site by logging in to: https://developer.amazon.com/edw/home.html 
+     * A working Amazon Echo, Echo Dot or even a newer Amazon Fire Table (with Alexa) is recommended and will provide the most fun with these exercises.  If you do not have an Echo or Alexa capable device, you will be able to simulate Alexa via the Alexa Developer Console
