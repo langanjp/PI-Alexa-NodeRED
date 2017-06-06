@@ -1,0 +1,591 @@
+[
+    {
+        "id": "1ffcf3ea.a8380c",
+        "type": "subflow",
+        "name": "PI Write",
+        "info": "",
+        "in": [
+            {
+                "x": 57,
+                "y": 108,
+                "wires": [
+                    {
+                        "id": "b49bfdec.530f8"
+                    }
+                ]
+            }
+        ],
+        "out": [
+            {
+                "x": 491,
+                "y": 167,
+                "wires": [
+                    {
+                        "id": "7b86327b.3850dc",
+                        "port": 0
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "id": "e1289b52.f3c368",
+        "type": "function",
+        "z": "1ffcf3ea.a8380c",
+        "name": "Yes",
+        "func": "var auth = msg.pi.auth;\nvar url = msg.pi.url;\nvar webid = msg.pi.webid;\n\nvar urlparam = webid;\nvar baseurl = \"/streams/\" + urlparam + \"/value\";\n\nmsg.url = url.concat(baseurl);\nmsg.method = \"POST\";\nmsg.headers = {\n    Authorization: auth                     \n};\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 181,
+        "y": 164.95745849609375,
+        "wires": [
+            [
+                "7b86327b.3850dc"
+            ]
+        ]
+    },
+    {
+        "id": "7b86327b.3850dc",
+        "type": "http request",
+        "z": "1ffcf3ea.a8380c",
+        "name": "Value to PI",
+        "method": "use",
+        "ret": "txt",
+        "url": "",
+        "tls": "",
+        "x": 344,
+        "y": 164.95745849609375,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "a48a4ff7.1df99",
+        "type": "function",
+        "z": "1ffcf3ea.a8380c",
+        "name": "No",
+        "func": "var auth = msg.pi.auth;\nvar url = msg.pi.url;\nvar path = msg.pi.path;\nvar baseurl = \"/attributes?path=\"; \nvar urlparam = encodeURIComponent(path);\nmsg.url = url.concat(baseurl,urlparam);\nmsg.method = \"GET\";\nmsg.headers = {\n        Authorization: auth                     \n    };\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 181,
+        "y": 215.95745849609375,
+        "wires": [
+            [
+                "5afb9d79.7c2ee4"
+            ]
+        ]
+    },
+    {
+        "id": "5afb9d79.7c2ee4",
+        "type": "http request",
+        "z": "1ffcf3ea.a8380c",
+        "name": "Attribute WebId from PI",
+        "method": "use",
+        "ret": "obj",
+        "url": "",
+        "tls": "",
+        "x": 385.66650390625,
+        "y": 215.95745849609375,
+        "wires": [
+            [
+                "f847387e.ce7648"
+            ]
+        ]
+    },
+    {
+        "id": "f847387e.ce7648",
+        "type": "function",
+        "z": "1ffcf3ea.a8380c",
+        "name": "",
+        "func": "var path = msg.payload.Path;\n//node.warn(path);\nvar webid = msg.payload.WebId;\n//node.warn(webid);\n\nglobal.set(path,webid);\nmsg.pi.webid = webid;\nmsg.payload = msg.xmsg;\ndelete msg.xmsg;\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 593,
+        "y": 215.95745849609375,
+        "wires": [
+            [
+                "e1289b52.f3c368"
+            ]
+        ]
+    },
+    {
+        "id": "b49bfdec.530f8",
+        "type": "function",
+        "z": "1ffcf3ea.a8380c",
+        "name": "Yes, Attribute WebId?",
+        "func": "var path = msg.pi.path;\n//node.warn(path);\nvar webid = global.get(path);\n//node.warn(webid);\n\nif (webid === null || webid === undefined) {    \n    msg.xmsg = msg.payload;\n    node.send([null, msg]);    \n}\n    else\n{\n    msg.pi.webid = webid;    \n    node.send([msg, null]);\n}\n\nreturn;",
+        "outputs": "2",
+        "noerr": 0,
+        "x": 228.2764892578125,
+        "y": 108,
+        "wires": [
+            [
+                "e1289b52.f3c368"
+            ],
+            [
+                "a48a4ff7.1df99"
+            ]
+        ]
+    },
+    {
+        "id": "555640bd.e2a2f",
+        "type": "comment",
+        "z": "1ffcf3ea.a8380c",
+        "name": "Write to PI",
+        "info": "",
+        "x": 188.2764892578125,
+        "y": 59,
+        "wires": []
+    },
+    {
+        "id": "455e834d.af538c",
+        "type": "http in",
+        "z": "e8356deb.f13ba",
+        "name": "",
+        "url": "/alexapi",
+        "method": "post",
+        "swaggerDoc": "",
+        "x": 79,
+        "y": 59,
+        "wires": [
+            [
+                "b2f0c135.e010e"
+            ]
+        ]
+    },
+    {
+        "id": "ac7dc721.cef488",
+        "type": "http response",
+        "z": "e8356deb.f13ba",
+        "name": "",
+        "x": 1126.0000305175781,
+        "y": 253.99999237060547,
+        "wires": []
+    },
+    {
+        "id": "79a58a38.f9f444",
+        "type": "function",
+        "z": "e8356deb.f13ba",
+        "name": "station error",
+        "func": "\nvar outputtext = \"The weather station of \" + msg.slots.station.value + \" does not exist in PI\";\nvar rep = {};\nrep.version  = '1.0';\nrep.sessionAttributes = {};\nrep.response = {\n    outputSpeech: {\n        type: \"PlainText\",\n        text: outputtext\n    },\n    shouldEndSession: true\n};\n \nmsg.payload = rep;\nmsg.headers = {\n    \"Content-Type\" :\"application/json;charset=UTF-8\"\n};\nreturn msg;\n",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 458,
+        "y": 253.99999237060547,
+        "wires": [
+            [
+                "ac7dc721.cef488"
+            ]
+        ]
+    },
+    {
+        "id": "8689bbd1.dec878",
+        "type": "switch",
+        "z": "e8356deb.f13ba",
+        "name": "Request Type",
+        "property": "payload.request.type",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "eq",
+                "v": "IntentRequest",
+                "vt": "str"
+            }
+        ],
+        "checkall": "true",
+        "outputs": 1,
+        "x": 90,
+        "y": 107,
+        "wires": [
+            [
+                "fcb5f0c5.272b1",
+                "73a9c131.336d4"
+            ]
+        ]
+    },
+    {
+        "id": "fcb5f0c5.272b1",
+        "type": "switch",
+        "z": "e8356deb.f13ba",
+        "name": "Intent",
+        "property": "payload.request.intent.name",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "eq",
+                "v": "weather",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "input",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "event",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "search",
+                "vt": "str"
+            }
+        ],
+        "checkall": "true",
+        "outputs": 4,
+        "x": 81,
+        "y": 406,
+        "wires": [
+            [
+                "1b43695f.b59647"
+            ],
+            [
+                "be162648.b312a8"
+            ],
+            [],
+            []
+        ]
+    },
+    {
+        "id": "1b43695f.b59647",
+        "type": "function",
+        "z": "e8356deb.f13ba",
+        "name": "Weather Translations",
+        "func": "// if houston - houston george bush\n// if humidity --> relative humidity\n\nvar slots = msg.payload.request.intent.slots;\nvar attributevalue = slots.attribute.value;\n// strip out any spaces\nattributevalue = attributevalue.replace(/\\s+/g, '');\nif (attributevalue == \"temp\") attributevalue = \"temperature\";\nif (attributevalue == \"humidity\") attributevalue = \"relativehumidity\";\n\nslots.attribute.value = attributevalue;\n\nmsg.slots = slots;\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 338,
+        "y": 161,
+        "wires": [
+            [
+                "40a4bae5.995a64"
+            ]
+        ]
+    },
+    {
+        "id": "40a4bae5.995a64",
+        "type": "function",
+        "z": "e8356deb.f13ba",
+        "name": "Prep for PI Search",
+        "func": "//url:  https://<yourpiwebapiserver>/piwebapi/search/query?q=*Houston* AND afelementtemplate:weather_gov_station\n\nvar slots = msg.slots;\nvar template = \"weather_gov_station\";\nvar auth = global.get(\"pi\").auth;\nvar url = global.get(\"pi\").url;\nvar baseurl = \"/search/query?q=\"; \nvar station = slots.station.value;\nvar param = (\"*\").concat(station,\"* AND afelementtemplate:\",template);\nvar urlparam = encodeURIComponent(param);\nmsg.url = url.concat(baseurl,urlparam);\nmsg.method = \"GET\";\nmsg.headers = {\n        Authorization: auth                     \n    };\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 577,
+        "y": 161,
+        "wires": [
+            [
+                "c1a076b4.e8eef8"
+            ]
+        ]
+    },
+    {
+        "id": "c1a076b4.e8eef8",
+        "type": "http request",
+        "z": "e8356deb.f13ba",
+        "name": "Search PI",
+        "method": "use",
+        "ret": "obj",
+        "url": "",
+        "tls": "",
+        "x": 775,
+        "y": 161,
+        "wires": [
+            [
+                "eb928738.5f6648"
+            ]
+        ]
+    },
+    {
+        "id": "eb928738.5f6648",
+        "type": "switch",
+        "z": "e8356deb.f13ba",
+        "name": "",
+        "property": "payload.TotalHits",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "gte",
+                "v": "1",
+                "vt": "num"
+            },
+            {
+                "t": "else"
+            }
+        ],
+        "checkall": "true",
+        "outputs": 2,
+        "x": 299,
+        "y": 249.99999237060547,
+        "wires": [
+            [
+                "dc590263.75a6e"
+            ],
+            [
+                "79a58a38.f9f444"
+            ]
+        ]
+    },
+    {
+        "id": "dc590263.75a6e",
+        "type": "function",
+        "z": "e8356deb.f13ba",
+        "name": "Attribute Values",
+        "func": "var items = msg.payload.Items[0]; // picks the first one (has highest score)\nmsg.element = {};\nmsg.element.description = items.Description;\nvar auth = global.get(\"pi\").auth;\nvar url = global.get(\"pi\").url;\nvar attribute = msg.slots.attribute.value;\n// need 3 seperate - first see if match - get webid, if not match or is weather, give weather\n\nvar attarray = items.Attributes;\nvar searchtext = attribute;\nvar attpos = -1;\nvar responsearray = [];\n\nif (attribute == \"weather\")\n    {\n        attpos = 0;\n    }\nelse \n    {\n        attpos = attarray.map(function(e) { return e.Name; }).indexOf(searchtext);\n//returns -1 if it can't find\n    }\n\nif (attpos > 0)\n    {\n        responsearray.push(attarray[attpos]);\n    }\nelse // assume looking for \"weather\"\n    {\n        searchtext = \"weather\";\n        attpos = attarray.map(function(e) { return e.Name; }).indexOf(searchtext);\n        responsearray.push(attarray[attpos]);        \n        searchtext = \"temperature\";\n        attpos = attarray.map(function(e) { return e.Name; }).indexOf(searchtext);\n        responsearray.push(attarray[attpos]);        \n    }\n\n//node.warn(responsearray);\n\n\n\n// use PI Web API streamset call - will work with one or multiple webid\nvar auth = global.get(\"pi\").auth;\nvar url = global.get(\"pi\").url;\nvar baseurl = \"/streamsets/value?webid=\"; \nvar uri = url.concat(baseurl,responsearray[0].WebId);\nfor (i = 1; i < responsearray.length; ++i) {\n    uri = uri.concat(\"&webid=\",responsearray[i].WebId);\n}\n\nmsg.url = url;\nmsg.method = \"POST\";\nmsg.headers = {\n        Authorization: auth,                     \n        \"X-PIWEBAPI-HTTP-METHOD\": \"GET\",\n        \"X-PIWEBAPI-RESOURCE-ADDRESS\": uri\n    };\n\nreturn msg;\n",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 467,
+        "y": 211.99999237060547,
+        "wires": [
+            [
+                "6f683364.d8596c"
+            ]
+        ]
+    },
+    {
+        "id": "4b9d8028.029c",
+        "type": "function",
+        "z": "e8356deb.f13ba",
+        "name": "Response",
+        "func": "var items = msg.payload.Items;\n\nvar outputtext = \"The \"  ;\nif (items[1]) {\n    outputtext = outputtext + \"current weather is \" + items[1].Value.Value + \" and the \"; \n}\noutputtext = outputtext + items[0].Name + \" is \" + items[0].Value.Value + \" \" + items[0].Value.UnitsAbbreviation;\noutputtext = outputtext + \" at \" + msg.element.description;\n\nnode.warn(outputtext);\n\n//var outputtext = \"The weather station of \" + msg.slots.station.value + \" does exist in PI\";\nvar rep = {};\nrep.version  = '1.0';\nrep.sessionAttributes = {};\nrep.response = {\n    outputSpeech: {\n        type: \"PlainText\",\n        text: outputtext\n    },\n    shouldEndSession: true\n};\n \nmsg.payload = rep;\nmsg.headers = {\n    \"Content-Type\" :\"application/json;charset=UTF-8\"\n};\nreturn msg;\n",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 961.0000610351562,
+        "y": 208,
+        "wires": [
+            [
+                "ac7dc721.cef488",
+                "aa58b977.e47518"
+            ]
+        ]
+    },
+    {
+        "id": "6f683364.d8596c",
+        "type": "http request",
+        "z": "e8356deb.f13ba",
+        "name": "Get PI Values",
+        "method": "use",
+        "ret": "obj",
+        "url": "",
+        "tls": "",
+        "x": 776.000244140625,
+        "y": 208,
+        "wires": [
+            [
+                "4b9d8028.029c"
+            ]
+        ]
+    },
+    {
+        "id": "aa58b977.e47518",
+        "type": "debug",
+        "z": "e8356deb.f13ba",
+        "name": "",
+        "active": false,
+        "console": "false",
+        "complete": "true",
+        "x": 1093.0715026855469,
+        "y": 152.71428680419922,
+        "wires": []
+    },
+    {
+        "id": "be162648.b312a8",
+        "type": "function",
+        "z": "e8356deb.f13ba",
+        "name": "Check Number",
+        "func": "var omsg = {};\nomsg.payload = msg.payload;\nomsg.req = msg.payload.req;\nomsg.res = msg.payload.res;\nmsg.omsg = omsg;\n\nvar readingint = msg.payload.request.intent.slots.inputreadingint.value;\nvar readingdec = msg.payload.request.intent.slots.inputreadingdec.value;\n\n// check to see if reading is valid\nif (readingint != null && readingint != \"?\"){\n// check for null or ? decimal; change to 0 or devide number by 100\n    if (readingdec == null || readingdec == \"?\") {\n        readingdec = 0;        \n    } else\n    {\n        readingdec = readingdec/10;\n    }\n    var reading = Number(readingint) + Number(readingdec);\n    msg.omsg.payload.request.intent.slots.inputreading = reading;\n    node.send([msg,null]);\n} else\n{\n    msg.output = \"Sorry, that was not a valid number\";\n    node.send([null,msg]);\n}\n\nreturn;",
+        "outputs": "2",
+        "noerr": 0,
+        "x": 302,
+        "y": 465,
+        "wires": [
+            [
+                "1dadd2dd.73ea0d"
+            ],
+            [
+                "1d972f.8dd298d1"
+            ]
+        ]
+    },
+    {
+        "id": "4755a2ca.e4712c",
+        "type": "comment",
+        "z": "e8356deb.f13ba",
+        "name": "Weather",
+        "info": "",
+        "x": 135,
+        "y": 167,
+        "wires": []
+    },
+    {
+        "id": "c61964cd.b32e68",
+        "type": "comment",
+        "z": "e8356deb.f13ba",
+        "name": "manual input",
+        "info": "",
+        "x": 142,
+        "y": 344,
+        "wires": []
+    },
+    {
+        "id": "1d972f.8dd298d1",
+        "type": "function",
+        "z": "e8356deb.f13ba",
+        "name": "Response",
+        "func": "var outputtext = msg.output;\nmsg.statusCode = null;\n\nvar rep = {};\nrep.version  = '1.0';\nrep.sessionAttributes = {};\nrep.response = {\n    outputSpeech: {\n        type: \"PlainText\",\n        text: outputtext\n    },\n    shouldEndSession: true\n};\n\nmsg.payload = rep;\nmsg.headers = {\n    \"Content-Type\" :\"application/json;charset=UTF-8\"\n};\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 988,
+        "y": 473,
+        "wires": [
+            [
+                "ac7dc721.cef488",
+                "fb14ee7c.e7e5"
+            ]
+        ]
+    },
+    {
+        "id": "1dadd2dd.73ea0d",
+        "type": "function",
+        "z": "e8356deb.f13ba",
+        "name": "Prep for PI",
+        "func": "var auth = global.get(\"pi\").auth;\nvar url = global.get(\"pi\").url;\nvar piafdb = global.get(\"pi\").afdb;\n//var pidb = global.get(\"pi\").pidb;\nvar parentelement = msg.payload.request.intent.slots.inputparentelement.value;\nvar element = msg.payload.request.intent.slots.inputelement.value;\nvar attribute = msg.payload.request.intent.slots.inputattribute.value;\n\n\nvar Resource = [];\nvar Method = [];\nvar Parameters = [];\nvar ParentIds = [];\nvar urlparam;\n\n\n//first get WebId and other attributes of attribute\n\nvar path = piafdb.concat(\"\\\\alexa\\\\manualinput\\\\\",parentelement,\"\\\\\",element,\"|\",attribute);\nvar baseurl = \"/attributes?path=\"; \nurlparam = encodeURIComponent(path);\n// note Resource.length on first use = 0\n// this is also the number we want for the 1st position (index) in the array\n\nidx=Resource.length;\nResource[idx] = url.concat(baseurl,urlparam);\n//url:  https://<yourserver>/piwebapi/attribute?path=\\\\\\\\<youraf>\\\\<afdb>\\\\<path>|element\nMethod[Method.length] = \"GET\";\nParameters[Parameters.length] = null;\nParentIds[ParentIds.length] = null;\n//node.warn(url.concat(baseurl,urlparam));\n\n\n\nvar path = piafdb.concat(\"\\\\alexa\\\\manualinput\\\\\",parentelement,\"\\\\\",element,\"|\",attribute,\"|\",\"maximum\");\nvar baseurl = \"/attributes?path=\"; \nurlparam = encodeURIComponent(path);\n\nidx=Resource.length;\nResource[idx] = url.concat(baseurl,urlparam);\n//url:  https://<yourserver>/piwebapi/attribute?path=\\\\\\\\<youraf>\\\\<afdb>\\\\<path>|element\nMethod[Method.length] = \"GET\";\nParameters[Parameters.length] = null;\nParentIds[ParentIds.length] = null;\n//node.warn(url.concat(baseurl,urlparam));\n\n\n//get value of attribute\nurlparam = (\"/\").concat(\"streams\",\"/\",\"{0}\",\"/\",\"value\");\nResource[Resource.length] = url.concat(urlparam);\nMethod[Method.length] = \"GET\";\nParameters[Parameters.length] = [\"$.1.Content.WebId\"];\nParentIds[ParentIds.length] = [\"1\"];\n\n\nvar path = piafdb.concat(\"\\\\alexa\\\\manualinput\\\\\",parentelement,\"\\\\\",element,\"|\",attribute,\"|\",\"minimum\");\nvar baseurl = \"/attributes?path=\"; \nurlparam = encodeURIComponent(path);\nidx=Resource.length;\nResource[idx] = url.concat(baseurl,urlparam);\nMethod[Method.length] = \"GET\";\nParameters[Parameters.length] = null;\nParentIds[ParentIds.length] = null;\n//node.warn(url.concat(baseurl,urlparam));\n\n\n//get value of attribute\nurlparam = (\"/\").concat(\"streams\",\"/\",\"{0}\",\"/\",\"value\");\nResource[Resource.length] = url.concat(urlparam);\nMethod[Method.length] = \"GET\";\nParameters[Parameters.length] = [\"$.3.Content.WebId\"];\nParentIds[ParentIds.length] = [\"3\"];\n\n\nvar body = {};\nvar i;\nfor (i = 0; i < Resource.length; ++i) {\n    body[i] = {};\n    body[i].Resource = Resource[i];\n    body[i].Method = Method[i];\n    if (Parameters[i]) body[i].Parameters = Parameters[i];\n    if (ParentIds[i]) body[i].ParentIds = ParentIds[i];\n}\n\nmsg.payload = body;\nurlparam = (\"/\").concat(\"batch\");\nmsg.url = url.concat(urlparam);\nmsg.method = \"POST\";\nmsg.headers = {\n        Authorization: auth                     \n    };\n    \nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 510,
+        "y": 341,
+        "wires": [
+            [
+                "c2c8ef7e.10f15"
+            ]
+        ]
+    },
+    {
+        "id": "c2c8ef7e.10f15",
+        "type": "http request",
+        "z": "e8356deb.f13ba",
+        "name": "Get PI Values",
+        "method": "use",
+        "ret": "obj",
+        "url": "",
+        "tls": "",
+        "x": 689,
+        "y": 341,
+        "wires": [
+            [
+                "3ec4f4af.d366ac"
+            ]
+        ]
+    },
+    {
+        "id": "3ec4f4af.d366ac",
+        "type": "function",
+        "z": "e8356deb.f13ba",
+        "name": "Exists and Limit Check",
+        "func": "//check: if exists, if IsManualDataEntry=true, check against min/max\nvar output;\nvar reading = msg.omsg.payload.request.intent.slots.inputreading;\nvar ismanual = msg.payload[0].Content.IsManualDataEntry;\nvar max = msg.payload[2].Content.Value;\nvar min = msg.payload[4].Content.Value;\n\nif (msg.payload[0].Status == \"404\") {\n  output = \"That path, element or attribute could not be found in PI\";  \n} else if (msg.payload[0].Status == \"200\"){\n   if (!ismanual) {\n       output = \"Sorry, this attribute does not allow manual entry\";\n   } else if (reading > max) {\n       output = (reading).concat(\" is greater than max \", max);\n   } else if (reading < min) {\n       output = reading.concat(\" is less than min\", min);\n   } else {\n        output = \"200\";\n   }\n} else\n{\n  output = \"Sorry, there was an unknown error\";\n}\n\n\n//node.warn(output);\nif (output == \"200\") {\n   node.send([msg,null]);\n} else {\n    msg.output = output;\n    node.send([null,msg]);\n}\n\n\nreturn;",
+        "outputs": "2",
+        "noerr": 0,
+        "x": 909,
+        "y": 341,
+        "wires": [
+            [
+                "886e78bf.26cc78"
+            ],
+            [
+                "1d972f.8dd298d1"
+            ]
+        ]
+    },
+    {
+        "id": "fb14ee7c.e7e5",
+        "type": "debug",
+        "z": "e8356deb.f13ba",
+        "name": "",
+        "active": true,
+        "console": "false",
+        "complete": "true",
+        "x": 1124,
+        "y": 417,
+        "wires": []
+    },
+    {
+        "id": "886e78bf.26cc78",
+        "type": "function",
+        "z": "e8356deb.f13ba",
+        "name": "PI Input",
+        "func": "var value = msg.omsg.payload.request.intent.slots.inputreading;\nvar timestamp = msg.omsg.payload.request.timestamp;\nvar webid = msg.payload[0].Content.WebId;\nvar path = msg.payload[0].Content.Path;\nvar auth = global.get(\"pi\").auth;\nvar url = global.get(\"pi\").url;\n\nglobal.set(path,webid);\n\nmsg.pi = {\n    auth: auth,\n    url: url,\n    path: path\n};\n\nvar body = {\n        Value: value,\n        Timestamp: timestamp\n        };\nmsg.payload = body;\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 499,
+        "y": 388,
+        "wires": [
+            [
+                "5b9b5515.7b3b8c"
+            ]
+        ]
+    },
+    {
+        "id": "b2f0c135.e010e",
+        "type": "switch",
+        "z": "e8356deb.f13ba",
+        "name": "check appid",
+        "property": "payload.session.application.applicationId",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "eq",
+                "v": "yourskillapplicationidhere",
+                "vt": "str"
+            }
+        ],
+        "checkall": "true",
+        "outputs": 1,
+        "x": 288,
+        "y": 60,
+        "wires": [
+            [
+                "8689bbd1.dec878"
+            ]
+        ]
+    },
+    {
+        "id": "5b9b5515.7b3b8c",
+        "type": "subflow:1ffcf3ea.a8380c",
+        "z": "e8356deb.f13ba",
+        "x": 658,
+        "y": 388,
+        "wires": [
+            [
+                "6a9da9e6.fcdd48"
+            ]
+        ]
+    },
+    {
+        "id": "6a9da9e6.fcdd48",
+        "type": "function",
+        "z": "e8356deb.f13ba",
+        "name": "Set Output",
+        "func": "var status = msg.statusCode;\n\nif (status.toString().substring(0,1) == \"2\"){\n    output = \"Value successfully written to PI\";\n} else\n{ \n    output = \"Unknown error while writing to PI\"; \n}\n\nmsg.output = output;\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 830,
+        "y": 388,
+        "wires": [
+            [
+                "1d972f.8dd298d1"
+            ]
+        ]
+    },
+    {
+        "id": "73a9c131.336d4",
+        "type": "debug",
+        "z": "e8356deb.f13ba",
+        "name": "",
+        "active": true,
+        "console": "false",
+        "complete": "true",
+        "x": 293,
+        "y": 109,
+        "wires": []
+    }
+]
