@@ -5,7 +5,7 @@ Connecting Amazon Echo with time-series data platform OSIsoft PI System via Node
 This project and tutorial show connecting to Amazon's Alexa service with the OSIsoft PI System.
 
 ## Tutorial
-Please refer to this project's [Wiki](https://github.com/langanjp/PI-NodeRED/wiki) for a tutorial and instructions
+Please refer to this project's [Wiki](https://github.com/langanjp/PI-Alexa-NodeRED/wiki) for a tutorial and instructions
 
 ## Pre-Reqs
 * Working Node-RED installation that is accessible from an external source
