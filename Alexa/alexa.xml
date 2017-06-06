@@ -1,0 +1,209 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<AF xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="OSIsoft.AF.xsd" SchemaVersion="2.0" SoftwareVersion="2.8.6.7801" ExportMode="AllReferences, NoUniqueID, SimplifiedConfigStrings" PISystem="PIVM" Database="USERDB" Description="" Created="2017-06-06T14:53:23.8373996Z" id="c38e86bb-186f-11e7-bf4a-001b21a1ada7" ParentKey="c5b3eb7e-0fd9-4d98-b8f8-3e007103d46f" ExportedObject="alexa" ExportedType="AFElement" Identity="Element" PIPersist="150 {9895150E-085D-4fcb-A16D-5EF5D2527196} 2\{35a6dd80-cd95-40f8-8979-5ae9ad618d58}\Elements[{c38e86bb-186f-11e7-bf4a-001b21a1ada7}]*PIVM\USERDB\alexa">
+  <AFElementTemplate>
+    <Name>tank</Name>
+    <Type>None</Type>
+    <InstanceType>Element</InstanceType>
+    <AllowElementToExtend>false</AllowElementToExtend>
+    <AFExtendedProperty>
+      <Name>Override</Name>
+      <Value type="AFElement">alexa\manualinput\tank\101</Value>
+    </AFExtendedProperty>
+    <AFAttributeTemplate>
+      <Name>bpf</Name>
+      <Type>Double</Type>
+      <Value type="Double">0</Value>
+    </AFAttributeTemplate>
+    <AFAttributeTemplate>
+      <Name>Level</Name>
+      <IsManualDataEntry>true</IsManualDataEntry>
+      <DefaultUOM>ft</DefaultUOM>
+      <Type>Double</Type>
+      <Value type="Double">0</Value>
+      <DataReference>PI Point</DataReference>
+      <ConfigString>\\%@\system|piserver%\alexainput.%..\Element%.%Element%.%Attribute%;pointtype=Float32;compdev=0.1;excdev=0.05;pointsource=L;span=20;step=1;typicalvalue=10;zero=0</ConfigString>
+      <AFAttributeCategoryRef>input</AFAttributeCategoryRef>
+      <AFAttributeTemplate>
+        <Name>Maximum</Name>
+        <Trait>Maximum</Trait>
+        <Value type="Double">20</Value>
+      </AFAttributeTemplate>
+      <AFAttributeTemplate>
+        <Name>Minimum</Name>
+        <Trait>Minimum</Trait>
+        <Value type="Double">0</Value>
+      </AFAttributeTemplate>
+    </AFAttributeTemplate>
+    <AFAttributeTemplate>
+      <Name>Volume</Name>
+      <DefaultUOM>bbl</DefaultUOM>
+      <Type>Double</Type>
+      <Value type="Double">0</Value>
+      <DataReference>PI Point</DataReference>
+      <ConfigString>\\%@\system|piserver%\alexainput.%..\Element%.%Element%.%Attribute%;pointtype=Float32;compdev=1;excdev=0.5;pointsource=L;zero=0;span=20000;step=1;typicalvalue=10000</ConfigString>
+    </AFAttributeTemplate>
+    <AFAnalysisTemplate>
+      <Name>tank volume</Name>
+      <Target>tank</Target>
+      <AFAnalysisRule>
+        <AFPlugIn>PerformanceEquation</AFPlugIn>
+        <ConfigString>Level := '{116e6a0a-dd1a-4c16-a0f1-4b98803584ac};Level';&#xD;
+bpf := '{6acbffd5-535b-402e-a535-8088217b2858};bpf';&#xD;
+Volume := Level * bpf;</ConfigString>
+        <VariableMapping>Volume||Volume;[GUID]||{fdf44e7b-d7ff-44a5-b451-a2ccdd518ed3};[GUID]||[UNSET];</VariableMapping>
+      </AFAnalysisRule>
+      <AFTimeRule>
+        <AFPlugIn>Natural</AFPlugIn>
+      </AFTimeRule>
+    </AFAnalysisTemplate>
+  </AFElementTemplate>
+  <AFReferenceType>
+    <Name>Parent-Child</Name>
+    <ChildName>Child</ChildName>
+    <ParentName>Parent</ParentName>
+    <Strength>Strong</Strength>
+  </AFReferenceType>
+  <AFElement>
+    <Name>alexa</Name>
+    <AFElement ReferenceType="Parent-Child">
+      <Name>manualinput</Name>
+      <AFElement ReferenceType="Parent-Child">
+        <Name>compressor</Name>
+        <AFElement ReferenceType="Parent-Child">
+          <Name>Hydorcracker Feed Gas</Name>
+        </AFElement>
+        <AFElement ReferenceType="Parent-Child">
+          <Name>Hyrdocracker Recycle</Name>
+        </AFElement>
+        <AFElement ReferenceType="Parent-Child">
+          <Name>Reformer Hot Recycle</Name>
+        </AFElement>
+        <AFElement ReferenceType="Parent-Child">
+          <Name>Reformer Recycle</Name>
+        </AFElement>
+      </AFElement>
+      <AFElement ReferenceType="Parent-Child">
+        <Name>tank</Name>
+        <AFElement ReferenceType="Parent-Child">
+          <Name>101</Name>
+          <Template>tank</Template>
+          <AFAttribute>
+            <Name>bpf</Name>
+            <Value type="Double">1000</Value>
+          </AFAttribute>
+          <AFAttribute>
+            <Name>Level</Name>
+            <DataReference>PI Point</DataReference>
+            <ConfigString>\\pivm\alexainput.tank.101.Level</ConfigString>
+            <AFAttributeCategoryRef>input</AFAttributeCategoryRef>
+          </AFAttribute>
+          <AFAttribute>
+            <Name>Volume</Name>
+            <DataReference>PI Point</DataReference>
+            <ConfigString>\\pivm\alexainput.tank.101.Volume</ConfigString>
+          </AFAttribute>
+          <AFAnalysis>
+            <Name>tank volume</Name>
+            <Template>tank volume</Template>
+            <Status>Enabled</Status>
+            <Target>
+              <AFElementRef>.\manualinput\tank\101</AFElementRef>
+            </Target>
+          </AFAnalysis>
+        </AFElement>
+        <AFElement ReferenceType="Parent-Child">
+          <Name>102</Name>
+          <Template>tank</Template>
+          <AFAttribute>
+            <Name>bpf</Name>
+            <Value type="Double">1200</Value>
+          </AFAttribute>
+          <AFAttribute>
+            <Name>Level</Name>
+            <DataReference>PI Point</DataReference>
+            <ConfigString>\\pivm\alexainput.tank.102.Level</ConfigString>
+            <AFAttributeCategoryRef>input</AFAttributeCategoryRef>
+          </AFAttribute>
+          <AFAttribute>
+            <Name>Volume</Name>
+            <DataReference>PI Point</DataReference>
+            <ConfigString>\\pivm\alexainput.tank.102.Volume</ConfigString>
+          </AFAttribute>
+          <AFAnalysis>
+            <Name>tank volume</Name>
+            <Template>tank volume</Template>
+            <Status>Enabled</Status>
+            <Target>
+              <AFElementRef>.\manualinput\tank\102</AFElementRef>
+            </Target>
+          </AFAnalysis>
+        </AFElement>
+      </AFElement>
+    </AFElement>
+    <AFElement ReferenceType="Parent-Child">
+      <Name>search</Name>
+      <AFElement ReferenceType="Parent-Child">
+        <Name>Houston</Name>
+        <AFElement ReferenceType="Parent-Child">
+          <Name>Alkylation</Name>
+          <Description>Alky</Description>
+        </AFElement>
+        <AFElement ReferenceType="Parent-Child">
+          <Name>Blending</Name>
+        </AFElement>
+        <AFElement ReferenceType="Parent-Child">
+          <Name>Boilers</Name>
+        </AFElement>
+        <AFElement ReferenceType="Parent-Child">
+          <Name>Crude Distillation</Name>
+          <Description>Crude</Description>
+        </AFElement>
+        <AFElement ReferenceType="Parent-Child">
+          <Name>Delayed Coker</Name>
+          <Description>DCU</Description>
+        </AFElement>
+        <AFElement ReferenceType="Parent-Child">
+          <Name>Diesel Hydrotreater</Name>
+          <Description>DHT</Description>
+        </AFElement>
+        <AFElement ReferenceType="Parent-Child">
+          <Name>Fluid Catalytic Cracker</Name>
+          <Description>FCC</Description>
+        </AFElement>
+        <AFElement ReferenceType="Parent-Child">
+          <Name>Gasoline Hydrotreater</Name>
+        </AFElement>
+        <AFElement ReferenceType="Parent-Child">
+          <Name>Hydrocracker</Name>
+          <Description>Isocracker</Description>
+        </AFElement>
+        <AFElement ReferenceType="Parent-Child">
+          <Name>Isomerization</Name>
+        </AFElement>
+        <AFElement ReferenceType="Parent-Child">
+          <Name>Reformer</Name>
+          <Description>CCR</Description>
+        </AFElement>
+        <AFElement ReferenceType="Parent-Child">
+          <Name>Sat Gas Plant</Name>
+          <Description>SGP</Description>
+        </AFElement>
+        <AFElement ReferenceType="Parent-Child">
+          <Name>Sulfur Recovery</Name>
+          <Description>SRU</Description>
+        </AFElement>
+        <AFElement ReferenceType="Parent-Child">
+          <Name>Tank Farm</Name>
+        </AFElement>
+        <AFElement ReferenceType="Parent-Child">
+          <Name>Unsat Gas Plant</Name>
+          <Description>UGP</Description>
+        </AFElement>
+        <AFElement ReferenceType="Parent-Child">
+          <Name>Vacuum Distillation</Name>
+          <Description>Vac</Description>
+        </AFElement>
+      </AFElement>
+    </AFElement>
+  </AFElement>
+</AF>

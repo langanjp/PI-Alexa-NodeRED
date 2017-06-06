@@ -1,0 +1,10 @@
+weather what is the {attribute} in {station}
+weather get {attribute} for {station}
+weather get {attribute} at {station}
+weather get {attribute} in {station}
+weather get me the {attribute} for {station}
+input to input {inputparentelement} {inputelement} {inputattribute} {inputreadingint}
+input to input {inputparentelement} {inputelement} {inputattribute} {inputreadingint} point {inputreadingdec}
+input to input {inputparentelement} {inputelement} {inputattribute} {inputreadingint} dot {inputreadingdec}
+input to input {inputparentelement} {inputelement} {inputattribute} {inputreadingint} point {inputreadingdec} feet
+input to input {inputparentelement} {inputelement} {inputattribute} {inputreadingint} feet
